@@ -358,4 +358,16 @@ const FOODS = [
   { name: "Seal Meat Soup", biome: "Deep North", health: 110, stamina: 37, eitr: 0 },
 ];
 
+// Combat difficulty: the "Combat" world modifier (World menu → Modifiers →
+// Combat). Scales how much damage enemies deal to the player. Default world
+// setting is "Normal" (100%). Community-sourced values - double check your
+// own world's modifier screen, since these can be fine-tuned per world.
+const COMBAT_DIFFICULTIES = [
+  { label: "Very Easy", enemyDamageMult: 0.25 },
+  { label: "Easy",      enemyDamageMult: 0.5 },
+  { label: "Normal",    enemyDamageMult: 1 },
+  { label: "Hard",      enemyDamageMult: 1.5 },
+  { label: "Very Hard", enemyDamageMult: 2 },
+];
+
 const BASE_HEALTH = 25;

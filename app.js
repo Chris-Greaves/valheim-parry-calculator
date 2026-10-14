@@ -38,6 +38,8 @@ const els = {
   biome: document.getElementById("biomeSelect"),
   enemy: document.getElementById("enemySelect"),
   attack: document.getElementById("attackSelect"),
+  combatDifficulty: document.getElementById("combatDifficulty"),
+  combatDifficultyOut: document.getElementById("combatDifficultyOut"),
   star: document.getElementById("starSelect"),
   bossNote: document.getElementById("bossNote"),
   customDamage: document.getElementById("customDamage"),
@@ -191,17 +193,27 @@ function starMultiplier(star) {
   return 1;
 }
 
+function currentCombatDifficulty() {
+  return COMBAT_DIFFICULTIES[Number(els.combatDifficulty.value)];
+}
+
+function updateCombatDifficultyOut() {
+  const d = currentCombatDifficulty();
+  els.combatDifficultyOut.textContent = `${d.label} (${Math.round(d.enemyDamageMult * 100)}%)`;
+}
+
 function currentRawDamage() {
+  const difficultyMult = currentCombatDifficulty().enemyDamageMult;
   const customOverride = els.customDamage.value.trim();
   if (customOverride !== "") {
-    return Number(customOverride) || 0;
+    return (Number(customOverride) || 0) * difficultyMult;
   }
   const enemy = currentEnemy();
   if (!enemy) return 0;
   const attack = enemy.attacks.find(a => a.label === els.attack.value);
   if (!attack) return 0;
-  const mult = enemy.boss ? 1 : starMultiplier(els.star.value);
-  return attack.amount * mult;
+  const starMult = enemy.boss ? 1 : starMultiplier(els.star.value);
+  return attack.amount * starMult * difficultyMult;
 }
 
 function fmt(n) {
@@ -321,6 +333,7 @@ els.armor.addEventListener("input", recalc);
 els.biome.addEventListener("change", populateEnemiesForBiome);
 els.enemy.addEventListener("change", populateAttacksForEnemy);
 els.attack.addEventListener("change", recalc);
+els.combatDifficulty.addEventListener("input", () => { updateCombatDifficultyOut(); recalc(); });
 els.star.addEventListener("change", recalc);
 els.customDamage.addEventListener("input", recalc);
 els.buffer.addEventListener("input", recalc);
@@ -335,3 +348,4 @@ els.suggestBtn.addEventListener("click", suggestCombos);
 els.shield.value = "Bronze Buckler";
 populateEnemiesForBiome();
 updateShieldInfo();
+updateCombatDifficultyOut();
