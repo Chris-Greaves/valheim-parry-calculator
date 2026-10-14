@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valheim Parry Calculator</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>⚔️ Valheim Parry Calculator</h1>
+  <p class="subtitle">Work out whether your shield/weapon and health pool can survive parrying a given enemy attack.</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>1. Your blocking item</h2>
+
+    <label for="shieldSelect">Shield / weapon</label>
+    <select id="shieldSelect"></select>
+    <p id="shieldInfo" class="info"></p>
+
+    <div id="customWrap" class="row" style="display:none;">
+      <div>
+        <label for="customPower">Block power (from tooltip)</label>
+        <input type="number" id="customPower" value="20" min="0">
+      </div>
+      <div>
+        <label for="customParry">Parry bonus (from tooltip)</label>
+        <input type="number" id="customParry" value="2" min="1" step="0.1">
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label for="quality">Item quality level: <span id="qualityOut">1</span>/4</label>
+        <input type="range" id="quality" min="1" max="4" value="1" step="1">
+      </div>
+      <div>
+        <label for="skill">Blocking skill: <span id="skillOut">0</span>/100</label>
+        <input type="range" id="skill" min="0" max="100" value="0" step="1">
+      </div>
+    </div>
+
+    <label class="checkbox">
+      <input type="checkbox" id="parryToggle" checked>
+      Timed as a parry (raised block in the ~0.25s window before the hit)
+    </label>
+    <p id="parryNote" class="info"></p>
+
+    <label for="armor">Your regular armor rating (applies to damage that leaks through the block)</label>
+    <input type="number" id="armor" value="0" min="0">
+  </section>
+
+  <section class="card">
+    <h2>2. The enemy attack</h2>
+
+    <label for="biomeSelect">Biome</label>
+    <select id="biomeSelect"><option value="">All biomes</option></select>
+
+    <label for="enemySelect">Enemy</label>
+    <select id="enemySelect"></select>
+
+    <label for="attackSelect">Attack</label>
+    <select id="attackSelect"></select>
+
+    <div class="row">
+      <div>
+        <label for="starSelect">Star level</label>
+        <select id="starSelect">
+          <option value="0">0★ (base)</option>
+          <option value="1">1★ (x1.5 damage)</option>
+          <option value="2">2★ (x2 damage)</option>
+        </select>
+      </div>
+      <div>
+        <label for="customDamage">Or override with a raw damage number</label>
+        <input type="number" id="customDamage" placeholder="leave blank to use the attack above">
+      </div>
+    </div>
+    <p id="bossNote" class="info warn" style="display:none;">
+      Boss — doesn't have star variants, and generally can't be staggered by a parry. The damage-reduction math below still applies, you just won't get the stagger punish window.
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>3. Result</h2>
+    <div class="row">
+      <div>
+        <label for="buffer">Safety buffer (extra HP on top of the bare minimum)</label>
+        <input type="number" id="buffer" value="10" min="0">
+      </div>
+    </div>
+
+    <table class="results">
+      <tr><td>Raw attack damage</td><td id="rawDamage">0</td></tr>
+      <tr><td>Your effective block power</td><td id="effPower">0</td></tr>
+      <tr><td>Damage that leaks past the block</td><td id="leaked">0</td></tr>
+      <tr><td>Damage after your regular armor</td><td id="finalDamage">0</td></tr>
+      <tr><td><strong>HP needed to survive (incl. buffer)</strong></td><td><strong id="neededHP">1</strong></td></tr>
+    </table>
+    <p id="verdict" class="verdict"></p>
+  </section>
+
+  <section class="card">
+    <h2>4. Food planner</h2>
+    <p class="info">Base health is 25. Up to 3 active foods stack on top of that.</p>
+
+    <label for="targetHP">Target max HP</label>
+    <input type="number" id="targetHP" value="25">
+
+    <div class="row three">
+      <div>
+        <label for="foodSlot1">Food 1</label>
+        <select id="foodSlot1"></select>
+      </div>
+      <div>
+        <label for="foodSlot2">Food 2</label>
+        <select id="foodSlot2"></select>
+      </div>
+      <div>
+        <label for="foodSlot3">Food 3</label>
+        <select id="foodSlot3"></select>
+      </div>
+    </div>
+
+    <p>Max HP with this combo: <strong id="foodTotal">25</strong></p>
+    <p id="foodVerdict" class="verdict"></p>
+
+    <button id="suggestBtn">Suggest cheapest combo for target</button>
+    <div id="suggestions"></div>
+  </section>
+</main>
+
+<footer>
+  <p>Numbers are best-effort community data (shield/enemy/food stats, block formula) — always double-check your own item tooltips in-game, which is why a "Custom" blocking-item option is included. Mechanic summarized: block/armor reduces damage along the same curve
+   (<code>power ≥ damage/2 → taken = damage²/(4·power)</code>, else <code>taken = damage − power</code>), parrying multiplies block power by the item's parry bonus, and regular armor applies a second time to whatever leaks through.</p>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
