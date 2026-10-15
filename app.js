@@ -281,14 +281,14 @@ function suggestCombos() {
     return;
   }
 
-  // Brute force over combos of 3 foods (repeats allowed - you can eat the
-  // same dish in multiple slots), keep ones that meet target with the
-  // smallest overshoot.
+  // Brute force over combos of 3 distinct foods (each food slot must hold
+  // a different dish), keep ones that meet target with the smallest
+  // overshoot.
   const n = FOODS.length;
   let best = [];
   for (let i = 0; i < n; i++) {
-    for (let j = i; j < n; j++) {
-      for (let k = j; k < n; k++) {
+    for (let j = i + 1; j < n; j++) {
+      for (let k = j + 1; k < n; k++) {
         const sum = FOODS[i].health + FOODS[j].health + FOODS[k].health;
         if (sum >= needFromFood) {
           best.push({ combo: [FOODS[i], FOODS[j], FOODS[k]], sum });
